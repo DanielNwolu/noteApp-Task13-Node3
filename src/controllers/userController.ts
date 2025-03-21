@@ -11,8 +11,7 @@ export const getAllUsers = async (
     ): Promise<void> => {
     try {
 
-        const users: UserResponse[] = await User.find();
-        
+        const users = await User.find().select('-password');
 
         // Get all users from the database
         res.status(200).json({
@@ -34,7 +33,7 @@ export const getUserById = async (
     ): Promise<void> => {
     try {
 
-        const user = await User.findById(req.params.id);  
+        const user = await User.findById(req.params.id).select('-password');  
 
         if (!user) {
             return next(new NotFoundError(`User with ID ${req.params.id} not found`));
@@ -74,12 +73,12 @@ export const createUser = async (
             password
         });
 
+        
         // Create a new user in the database
         res.status(201).json({
         status: 'success',
-        data: {
-            user: newUser
-        }
+        message: "user created successfully",
+        data: { }
         });
     } catch (error) {
         next(error);
