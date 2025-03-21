@@ -15,7 +15,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'https://note-taking-api-hzp3.onrender.com',
+        url: 'http://localhost:8000',
         description: 'Development server'
       }
     ],

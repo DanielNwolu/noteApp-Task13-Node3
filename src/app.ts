@@ -10,6 +10,7 @@ import categoryRoutes from './routes/categoryRoutes';
 import { errorHandler } from './middleware/errorMiddleware';
 import { requestLogger } from './middleware/loggingMiddleware';
 import { NotFoundError } from './utils/errorClasses';
+import userRoutes from './routes/userRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -32,6 +33,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
 // API routes
 app.use('/api/notes', noteRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/users', userRoutes)
 
 // Handle undefined routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
