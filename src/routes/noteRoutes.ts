@@ -12,7 +12,6 @@ import { requireJwtMiddleware } from '../middleware/authMiddleware';
 import { requestLogger } from '../middleware/loggingMiddleware';
 
 const router = Router();
-
 /**
  * @swagger
  * /api/notes:
@@ -20,6 +19,8 @@ const router = Router();
  *     summary: Retrieve all notes
  *     description: Retrieve a list of all notes sorted by last updated.
  *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of notes
@@ -49,7 +50,7 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.route('/')
-  .get(getAllNotes)
+  .get(requireJwtMiddleware, getAllNotes)
   /**
    * @swagger
    * /api/notes:
@@ -58,7 +59,7 @@ router.route('/')
    *     description: Create a new note with title and content.
    *     tags: [Notes]
    *     security:
-    *       - bearerAuth: []
+   *       - bearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
@@ -106,7 +107,7 @@ router.route('/')
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  .post(requireJwtMiddleware,requestLogger,validateRequest(validateNote), createNote);
+  .post(requireJwtMiddleware, requestLogger, validateRequest(validateNote), createNote);
 
 /**
  * @swagger
@@ -115,6 +116,8 @@ router.route('/')
  *     summary: Get a specific note
  *     description: Retrieve a specific note by its ID.
  *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -154,6 +157,8 @@ router.route('/')
  *     summary: Delete a note
  *     description: Delete a specific note by its ID.
  *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -180,6 +185,8 @@ router.route('/')
  *     summary: Update a note
  *     description: Update an existing note by ID.
  *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -239,10 +246,9 @@ router.route('/')
  *               $ref: '#/components/schemas/Error'
  */
 router.route('/:id')
-  .get(getNoteById)
-  .delete(deleteNote)
-  .patch(validateRequest(validateNoteUpdate), updateNote);
-
+  .get(requireJwtMiddleware, getNoteById)
+  .delete(requireJwtMiddleware, deleteNote)
+  .patch(requireJwtMiddleware, validateRequest(validateNoteUpdate), updateNote);
 
 /**
  * @swagger
@@ -251,6 +257,8 @@ router.route('/:id')
  *     summary: Retrieve notes by category
  *     description: Retrieve a list of notes filtered by category ID, sorted by last updated
  *     tags: [Notes]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: categoryId
@@ -297,8 +305,6 @@ router.route('/:id')
  *               $ref: '#/components/schemas/Error'
  */
 router.route('/categories/:categoryId')
-  .get(getNotesByCategory);
-
-
+  .get(requireJwtMiddleware, getNotesByCategory);
 
 export default router;
