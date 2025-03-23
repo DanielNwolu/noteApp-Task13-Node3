@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { loginUser } from '../controllers/authController';
+import { loginUser, registerUser } from '../controllers/authController';
 import { requestLogger } from '../middleware/loggingMiddleware';
+
 
 const router = Router();
 
@@ -55,5 +56,67 @@ router.route('/login')
      *               $ref: '#/components/schemas/Error'
      */
     .post(requestLogger, loginUser);
+
+router.route('/register')
+    /**
+     * @swagger
+     * /api/auth/register:
+     *   post:
+     *     summary: register a new user
+     *     description: Create a new user with username, email, and password.
+     *     tags: [Auth]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - username
+     *               - email
+     *               - password
+     *             properties:
+     *               username:
+     *                 type: string
+     *                 example: john_doe
+     *               email:
+     *                 type: string
+     *                 format: email
+     *                 example: johndoe@gmail.com
+     *               password:
+     *                 type: string
+     *                 format: password
+     *                 example: password123!
+     *     responses:
+     *       201:
+     *         description: User created successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 status:
+     *                   type: string
+     *                   example: success
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     user:
+     *                       $ref: '#/components/schemas/User'
+     *       400:
+     *         description: Bad request - Invalid input data
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     */
+
+    .post(requestLogger,registerUser)
 
 export default router;

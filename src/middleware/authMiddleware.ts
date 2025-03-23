@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import {Session, PartialSession, EncodeResult,DecodeResult, ExpirationStatus} from '../interfaces/authInterface'
 import {decodeSession, checkExpirationStatus, encodeSession} from '../config/jwt'
 import config from "../config/config";
-
+import { json } from "express";
 
 
 /**
@@ -15,16 +15,27 @@ export function requireJwtMiddleware(request: Request, response: Response, next:
         message: message
     });
 
-    const requestHeader = "X-JWT-Token";
+    const requestHeader = "Authorization";
     const responseHeader = "X-Renewed-JWT-Token";
     const header = request.header(requestHeader);
+
+    console.log(header)
 
     if (!header) {
         unauthorized(`Required ${requestHeader} header not found.`);
         return;
     }
 
-    const decodedSession: DecodeResult = decodeSession(config.jwt.access_token, header);
+    // Extract token from the header by removing "Bearer " prefix
+    let token = header;
+    
+    // Check if the header starts with "Bearer " and extract only the token part
+    if (header.startsWith("Bearer ")) {
+        token = header.slice(7); // Remove "Bearer " prefix (7 characters)
+    }
+
+
+    const decodedSession: DecodeResult = decodeSession(config.jwt.access_token, token);
     
     if (decodedSession.type === "integrity-error" || decodedSession.type === "invalid-token") {
         unauthorized(`Failed to decode or validate authorization token. Reason: ${decodedSession.type}.`);

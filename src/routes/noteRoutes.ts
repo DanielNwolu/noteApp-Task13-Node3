@@ -8,6 +8,7 @@ import {
   getNotesByCategory
 } from '../controllers/noteController';
 import { validateRequest, validateNote, validateNoteUpdate } from '../middleware/validationMiddleware';
+import { requireJwtMiddleware } from '../middleware/authMiddleware';
 import { requestLogger } from '../middleware/loggingMiddleware';
 
 const router = Router();
@@ -56,6 +57,8 @@ router.route('/')
    *     summary: Create a new note
    *     description: Create a new note with title and content.
    *     tags: [Notes]
+   *     security:
+    *       - bearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
@@ -103,7 +106,7 @@ router.route('/')
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  .post(validateRequest(validateNote), createNote);
+  .post(requireJwtMiddleware,requestLogger,validateRequest(validateNote), createNote);
 
 /**
  * @swagger

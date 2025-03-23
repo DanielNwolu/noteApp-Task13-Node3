@@ -2,7 +2,6 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from './config/swagger';
 import noteRoutes from './routes/noteRoutes';
@@ -12,6 +11,7 @@ import { errorHandler } from './middleware/errorMiddleware';
 import { requestLogger } from './middleware/loggingMiddleware';
 import { NotFoundError } from './utils/errorClasses';
 import userRoutes from './routes/userRoutes';
+
 
 const app: Application = express();
 

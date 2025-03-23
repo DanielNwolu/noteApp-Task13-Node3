@@ -4,6 +4,7 @@ import { Session, PartialSession, EncodeResult, DecodeResult, ExpirationStatus }
 import { decodeSession, checkExpirationStatus, encodeSession } from '../config/jwt';
 import config from "../config/config";
 import User from '../models/userModel'; // Assuming you have a User model
+import { CreateUserRequest, UpdateUserRequest, UserResponse } from '../interfaces/userInterface';
 
 
 
@@ -52,3 +53,37 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         next(error);
     }
 };
+
+
+export const registerUser = async (
+    req: Request<{}, {}, CreateUserRequest>,
+    res: Response,
+    next: NextFunction
+    ): Promise<void> => {
+    try {
+
+        const { username, email, password } = req.body;
+
+        // check if the user already exists using email
+        const userExists = await User.exists({email:email});
+        if(userExists){
+            return next(new BadRequestError('User already exists'));
+        }
+
+        const newUser = await User.create({
+            username,
+            email,
+            password
+        });
+
+        
+        // Create a new user in the database
+        res.status(201).json({
+        status: 'success',
+        message: "user created successfully",
+        data: { }
+        });
+    } catch (error) {
+        next(error);
+    }
+    };

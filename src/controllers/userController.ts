@@ -51,39 +51,7 @@ export const getUserById = async (
     }
     }
 
-// Create a new user
-export const createUser = async (
-    req: Request<{}, {}, CreateUserRequest>,
-    res: Response,
-    next: NextFunction
-    ): Promise<void> => {
-    try {
 
-        const { username, email, password } = req.body;
-
-        // check if the user already exists using email
-        const userExists = await User.exists({email:email});
-        if(userExists){
-            return next(new BadRequestError('User already exists'));
-        }
-
-        const newUser = await User.create({
-            username,
-            email,
-            password
-        });
-
-        
-        // Create a new user in the database
-        res.status(201).json({
-        status: 'success',
-        message: "user created successfully",
-        data: { }
-        });
-    } catch (error) {
-        next(error);
-    }
-    };
 
 // Update a user
 export const updateUser = async (

@@ -1,6 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { version } from '../../package.json';
-import User from '../models/userModel';
+
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -21,6 +21,13 @@ const options: swaggerJsdoc.Options = {
       }
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
       schemas: {
         Note: {
           type: 'object',
