@@ -16,7 +16,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:8000',
+        url: 'https://noteapp-task13-node3.onrender.com',
         description: 'Development server'
       }
     ],
