@@ -1,11 +1,8 @@
 import app from './app';
 import { connectDB } from './config/db';
-import dotenv from 'dotenv';
+import config from "./config/config";
 
-// Load environment variables
-dotenv.config();
-
-const PORT = process.env.PORT || 5000;
+const PORT = config.server.port || 5000;
 
 // Connect to database
 connectDB().then(() => {

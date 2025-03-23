@@ -1,6 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { version } from '../../package.json';
 
+
 const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
@@ -15,11 +16,18 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'https://note-taking-api-hzp3.onrender.com',
+        url: 'http://localhost:8000',
         description: 'Development server'
       }
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
       schemas: {
         Note: {
           type: 'object',
@@ -72,6 +80,27 @@ const options: swaggerJsdoc.Options = {
             color: {
               type: 'string',
               example: '#FF5733'
+            }
+          }
+        },
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              example: '5f8d04b3ab35b428f8611098'
+            },
+            username: {
+              type: 'string',
+              example: 'john doe'
+            },
+            email: {
+              type: 'string',
+              example: 'johndoe@gmail.com'
+            },
+            password: {
+              type: 'string',
+              example: 'Password123!'
             }
           }
         },
