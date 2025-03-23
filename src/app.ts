@@ -6,14 +6,12 @@ import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from './config/swagger';
 import noteRoutes from './routes/noteRoutes';
+import authRoutes from './routes/authRoutes'
 import categoryRoutes from './routes/categoryRoutes';
 import { errorHandler } from './middleware/errorMiddleware';
 import { requestLogger } from './middleware/loggingMiddleware';
 import { NotFoundError } from './utils/errorClasses';
 import userRoutes from './routes/userRoutes';
-
-// Load environment variables
-dotenv.config();
 
 const app: Application = express();
 
@@ -24,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Swagger documentation route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Note-Taking API Documentation'
@@ -34,6 +32,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
 app.use('/api/notes', noteRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes)
+app.use('/api/auth', authRoutes)
 
 // Handle undefined routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
