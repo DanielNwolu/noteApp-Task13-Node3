@@ -5,9 +5,9 @@ import {
   getAllCategories,
 } from '../controllers/categoryController';
 import { validateRequest, validateNote, validateNoteUpdate } from '../middleware/validationMiddleware';
+import { requireJwtMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
-
 /**
  * @swagger
  * /api/categories:
@@ -15,6 +15,8 @@ const router = Router();
  *     summary: Retrieve all categories
  *     description: Retrieve a list of all categories sorted by creation date.
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of categories
@@ -46,6 +48,8 @@ const router = Router();
  *     summary: Create a new category
  *     description: Create a new category with name and optional description/color.
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -94,7 +98,7 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.route('/')
-  .get(getAllCategories)
-  .post(createCategory);
+  .get(requireJwtMiddleware, getAllCategories)
+  .post(requireJwtMiddleware, createCategory);
 
 export default router;

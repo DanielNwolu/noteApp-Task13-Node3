@@ -7,6 +7,7 @@ import {
 } from '../controllers/userController';
 import { validateRequest, validateUser, validateUserUpdate } from '../middleware/validationMiddleware';
 import { requestLogger } from '../middleware/loggingMiddleware';
+import { requireJwtMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
@@ -18,6 +19,8 @@ router.route('/')
      *     summary: Retrieve all users
      *     description: Retrieve a list of all users.
      *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
      *     responses:
      *       200:
      *         description: A list of users
@@ -43,10 +46,9 @@ router.route('/')
      *             schema:
      *               $ref: '#/components/schemas/Error'
      */
-    .get(requestLogger, getAllUsers)
+    .get(requireJwtMiddleware,requestLogger, getAllUsers)
 
 router.route('/:id')
-
     /**
      * @swagger
      * /api/users/{id}:
@@ -54,6 +56,8 @@ router.route('/:id')
      *     summary: Retrieve a user by ID
      *     description: Retrieve a user by its ID.
      *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: id
@@ -93,6 +97,8 @@ router.route('/:id')
      *     summary: Delete a user by ID
      *     description: Delete a user by its ID.
      *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: id
@@ -130,6 +136,8 @@ router.route('/:id')
      *     summary: Update a user by ID
      *     description: Update a user by its ID.
      *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: id
@@ -190,9 +198,8 @@ router.route('/:id')
      *             schema:
      *               $ref: '#/components/schemas/Error'
      */
-    .get(requestLogger,getUserById)
-    .delete(requestLogger,deleteUser)
-    .put(requestLogger,validateRequest(validateUserUpdate), updateUser);
-
+    .get(requireJwtMiddleware,requestLogger, getUserById)
+    .delete(requireJwtMiddleware,requestLogger, deleteUser)
+    .put(requireJwtMiddleware,requestLogger, validateRequest(validateUserUpdate), updateUser);
 
 export default router;
