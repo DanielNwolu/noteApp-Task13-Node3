@@ -24,3 +24,18 @@ export class BadRequestError extends AppError {
       super(message, 400);
     }
   }
+
+export class ForbiddenError extends Error {
+  statusCode: number;
+  status: string;
+  isOperational: boolean;
+  
+  constructor(message: string) {
+    super(message);
+    this.statusCode = 403;
+    this.status = 'fail';
+    this.isOperational = true;
+    
+    Error.captureStackTrace(this, this.constructor);
+  }
+}

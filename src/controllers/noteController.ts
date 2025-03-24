@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import Note from '../models/noteModel';
 import Category from '../models/categoryModel';
-import { NotFoundError, BadRequestError } from '../utils/errorClasses';
+import { NotFoundError, BadRequestError , ForbiddenError} from '../utils/errorClasses';
 import { CreateNoteRequest, UpdateNoteRequest } from '../interfaces/noteInterface';
+import { getUserIdFromResponse } from '../utils/authUtils';
+import { forbidden } from 'joi';
 
 // Get all notes (existing function)
 export const getAllNotes = async (
@@ -11,7 +13,11 @@ export const getAllNotes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const notes = await Note.find()
+
+        // Use the utility function instead of direct access
+    const userId = getUserIdFromResponse(res);
+
+    const notes = await Note.find({user:userId})
       .populate('category', 'name color')
       .sort({ updatedAt: -1 });
     
@@ -34,12 +40,18 @@ export const getNoteById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+        // Use the utility function instead of direct access
+    const userId = getUserIdFromResponse(res);
     const note = await Note.findById(req.params.id).populate('category', 'name color');
     
     if (!note) {
       return next(new NotFoundError(`Note with ID ${req.params.id} not found`));
     }
-    
+     
+    if (note.user.toString() !== userId) {
+      return next(new ForbiddenError("you are not authorised to view this resource"));
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -58,6 +70,9 @@ export const createNote = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+
+    // Use the utility function instead of direct access
+    const userId = getUserIdFromResponse(res);
     const { title, content, categoryId } = req.body;
     
     // If categoryId is provided, check if category exists
@@ -71,7 +86,8 @@ export const createNote = async (
     const newNote = await Note.create({
       title,
       content,
-      category: categoryId || null
+      category: categoryId || null,
+      user: userId
     });
     
     // Populate the category field for the response
@@ -95,6 +111,9 @@ export const updateNote = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+
+    // Use the utility function instead of direct access
+    const userId = getUserIdFromResponse(res);
     const { title, content, categoryId } = req.body;
     
     // If categoryId is provided, check if category exists
@@ -104,7 +123,17 @@ export const updateNote = async (
         return next(new BadRequestError(`Category with ID ${categoryId} not found`));
       }
     }
+
+    const note = await Note.findById(req.params.id).populate('category', 'name color');
     
+    if (!note) {
+      return next(new NotFoundError(`Note with ID ${req.params.id} not found`));
+    }
+     
+    if (!note || note.user.toString() !== userId) {
+      return next(new ForbiddenError("you are not authorised to view this resource"));
+    }
+
     const updateData: UpdateNoteRequest = {};
     if (title !== undefined) updateData.title = title;
     if (content !== undefined) updateData.content = content;
@@ -144,10 +173,17 @@ export const deleteNote = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+
+        // Use the utility function instead of direct access
+    const userId = getUserIdFromResponse(res);
     const note = await Note.findByIdAndDelete(req.params.id);
     
     if (!note) {
       return next(new NotFoundError(`Note with ID ${req.params.id} not found`));
+    }
+
+    if (!note || note.user.toString() !== userId) {
+      return next(new ForbiddenError("you are not authorised to view this resource"));
     }
     
     res.status(204).end();
@@ -164,6 +200,9 @@ export const getNotesByCategory = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+
+        // Use the utility function instead of direct access
+    const userId = getUserIdFromResponse(res);
     const { categoryId } = req.params;
     
     // Verify category exists
@@ -172,10 +211,12 @@ export const getNotesByCategory = async (
       return next(new NotFoundError(`Category with ID ${categoryId} not found`));
     }
     
-    const notes = await Note.find({ category: categoryId })
+    const notes = await Note.find({ category: categoryId, user: userId })
       .populate('category', 'name color')
-      .sort({ updatedAt: -1 });
-    
+      .sort({ 
+      updatedAt: -1
+      });
+
     res.status(200).json({
       status: 'success',
       results: notes.length,
