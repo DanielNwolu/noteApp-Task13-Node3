@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
     getAllUsers,
-    getUserById,
+    getUser,
     updateUser,
     deleteUser
 } from '../controllers/userController';
@@ -198,7 +198,7 @@ router.route('/:id')
      *             schema:
      *               $ref: '#/components/schemas/Error'
      */
-    .get(requireJwtMiddleware,requestLogger, getUserById)
+    .get(requireJwtMiddleware,requestLogger, getUser)
     .delete(requireJwtMiddleware,requestLogger, deleteUser)
     .put(requireJwtMiddleware,requestLogger, validateRequest(validateUserUpdate), updateUser);
 
