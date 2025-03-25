@@ -4,7 +4,7 @@ import Category from '../models/categoryModel';
 import { NotFoundError, BadRequestError , ForbiddenError} from '../utils/errorClasses';
 import { CreateNoteRequest, UpdateNoteRequest } from '../interfaces/noteInterface';
 import { getUserIdFromResponse } from '../utils/authUtils';
-import { forbidden } from 'joi';
+
 
 // Get all notes (existing function)
 export const getAllNotes = async (

@@ -17,6 +17,11 @@ const categorySchema = new Schema<ICategory>(
     color: {
       type: String,
       default: '#3498db' // Default blue color
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'A category must belong to a user']
     }
   },
   {
