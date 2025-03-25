@@ -1,5 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import { INote } from '../interfaces/noteInterface';
+import User from '../models/userModel'; // Import user interface
+
+
 
 const noteSchema = new Schema<INote>(
   {
@@ -18,11 +21,18 @@ const noteSchema = new Schema<INote>(
       type: Schema.Types.ObjectId,
       ref: 'Category',
       default: null
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'A note must belong to a user']
     }
   },
   {
     timestamps: true,
-    versionKey: false
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
