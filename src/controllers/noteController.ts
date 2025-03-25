@@ -201,7 +201,7 @@ export const getNotesByCategory = async (
 ): Promise<void> => {
   try {
 
-        // Use the utility function instead of direct access
+    // Use the utility function instead of direct access
     const userId = getUserIdFromResponse(res);
     const { categoryId } = req.params;
     
@@ -210,7 +210,13 @@ export const getNotesByCategory = async (
     if (!categoryExists) {
       return next(new NotFoundError(`Category with ID ${categoryId} not found`));
     }
-    
+
+    const category = await Category.findById(categoryId)
+
+    if (!category || category.user.toString() !== userId) {
+      return next(new ForbiddenError("you are not authorised to view this resource"));
+    }
+
     const notes = await Note.find({ category: categoryId, user: userId })
       .populate('category', 'name color')
       .sort({ 

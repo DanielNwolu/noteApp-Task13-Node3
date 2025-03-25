@@ -19,7 +19,6 @@ export function requireJwtMiddleware(request: Request, response: Response, next:
     const responseHeader = "X-Renewed-JWT-Token";
     const header = request.header(requestHeader);
 
-    console.log(header)
 
     if (!header) {
         unauthorized(`Required ${requestHeader} header not found.`);
