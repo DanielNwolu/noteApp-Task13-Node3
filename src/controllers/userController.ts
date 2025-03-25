@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/userModel';
-import { NotFoundError, BadRequestError } from '../utils/errorClasses';
+import { NotFoundError, BadRequestError, ForbiddenError } from '../utils/errorClasses';
 import { CreateUserRequest, UpdateUserRequest, UserResponse } from '../interfaces/userInterface';
+import { getUserIdFromResponse } from '../utils/authUtils';
+
 
 // Get all users
 export const getAllUsers = async (
@@ -10,6 +12,9 @@ export const getAllUsers = async (
     next: NextFunction
     ): Promise<void> => {
     try {
+
+        // Use the utility function instead of direct access
+        const userId = getUserIdFromResponse(res);
 
         const users = await User.find().select('-password');
 
@@ -26,14 +31,16 @@ export const getAllUsers = async (
     };
 
 // Get a specific user
-export const getUserById = async (
+export const getUser = async (
     req: Request,
     res: Response,
     next: NextFunction
     ): Promise<void> => {
     try {
 
-        const user = await User.findById(req.params.id).select('-password');  
+         // Use the utility function instead of direct access
+        const userId = getUserIdFromResponse(res);
+        const user = await User.findById(userId).select('-password');  
 
         if (!user) {
             return next(new NotFoundError(`User with ID ${req.params.id} not found`));
@@ -61,7 +68,14 @@ export const updateUser = async (
     ): Promise<void> => {
     try {
         
+                // Use the utility function instead of direct access
+        const userId = getUserIdFromResponse(res);
         const { username, email } = req.body;
+
+        const user = await User.findById(userId)
+        if (!user || user.id.toString() != userId){
+            return next (new ForbiddenError("You dont have access to this information"))
+        }
 
         // check if the user already exists using email
         const updateUser= await User.findByIdAndUpdate(
@@ -98,7 +112,15 @@ export const deleteUser = async (
     next: NextFunction
     ): Promise<void> => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
+        
+        const userId = getUserIdFromResponse(res);
+
+        const user = await User.findById(userId)
+        if (!user || user.id.toString() != userId){
+            return next (new ForbiddenError("You dont have access to this information"))
+        }
+
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!user) {
             return next(new NotFoundError(`User with ID ${req.params.id} not found`));
         }

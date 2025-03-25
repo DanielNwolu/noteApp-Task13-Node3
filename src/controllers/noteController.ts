@@ -4,6 +4,7 @@ import Category from '../models/categoryModel';
 import { NotFoundError, BadRequestError , ForbiddenError} from '../utils/errorClasses';
 import { CreateNoteRequest, UpdateNoteRequest } from '../interfaces/noteInterface';
 import { getUserIdFromResponse } from '../utils/authUtils';
+
 import { forbidden } from 'joi';
 
 // Get all notes (existing function)
@@ -13,6 +14,7 @@ export const getAllNotes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+
 
         // Use the utility function instead of direct access
     const userId = getUserIdFromResponse(res);
@@ -52,6 +54,7 @@ export const getNoteById = async (
       return next(new ForbiddenError("you are not authorised to view this resource"));
     }
 
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -87,7 +90,7 @@ export const createNote = async (
       title,
       content,
       category: categoryId || null,
-      user: userId
+      user: userId,
     });
     
     // Populate the category field for the response
@@ -125,6 +128,7 @@ export const updateNote = async (
     }
 
     const note = await Note.findById(req.params.id).populate('category', 'name color');
+    
     
     if (!note) {
       return next(new NotFoundError(`Note with ID ${req.params.id} not found`));
@@ -173,7 +177,6 @@ export const deleteNote = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-
         // Use the utility function instead of direct access
     const userId = getUserIdFromResponse(res);
     const note = await Note.findByIdAndDelete(req.params.id);
@@ -201,6 +204,7 @@ export const getNotesByCategory = async (
 ): Promise<void> => {
   try {
 
+    // Use the utility function instead of direct access
         // Use the utility function instead of direct access
     const userId = getUserIdFromResponse(res);
     const { categoryId } = req.params;
@@ -210,12 +214,20 @@ export const getNotesByCategory = async (
     if (!categoryExists) {
       return next(new NotFoundError(`Category with ID ${categoryId} not found`));
     }
+
+    const category = await Category.findById(categoryId)
+
+    if (!category || category.user.toString() !== userId) {
+      return next(new ForbiddenError("you are not authorised to view this resource"));
+    }
+
     
     const notes = await Note.find({ category: categoryId, user: userId })
       .populate('category', 'name color')
       .sort({ 
       updatedAt: -1
       });
+
 
     res.status(200).json({
       status: 'success',

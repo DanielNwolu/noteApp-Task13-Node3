@@ -4,7 +4,6 @@ import {
   createCategory,
   getAllCategories,
 } from '../controllers/categoryController';
-import { validateRequest, validateNote, validateNoteUpdate } from '../middleware/validationMiddleware';
 import { requireJwtMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();

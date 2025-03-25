@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
     getAllUsers,
-    getUserById,
+    getUser,
     updateUser,
     deleteUser
 } from '../controllers/userController';
@@ -16,14 +16,14 @@ router.route('/')
      * @swagger
      * /api/users:
      *   get:
-     *     summary: Retrieve all users
+     *     summary: Retrive the current user
      *     description: Retrieve a list of all users.
      *     tags: [Users]
      *     security:
      *       - bearerAuth: []
      *     responses:
      *       200:
-     *         description: A list of users
+     *         description: return current user details
      *         content:
      *           application/json:
      *             schema:
@@ -46,53 +46,12 @@ router.route('/')
      *             schema:
      *               $ref: '#/components/schemas/Error'
      */
-    .get(requireJwtMiddleware,requestLogger, getAllUsers)
+    .get(requireJwtMiddleware,requestLogger, getUser)
 
 router.route('/:id')
     /**
      * @swagger
      * /api/users/{id}:
-     *   get:
-     *     summary: Retrieve a user by ID
-     *     description: Retrieve a user by its ID.
-     *     tags: [Users]
-     *     security:
-     *       - bearerAuth: []
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         required: true
-     *         description: ID of the user to retrieve
-     *         schema:
-     *           type: string
-     *     responses:
-     *       200:
-     *         description: User retrieved successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 status:
-     *                   type: string
-     *                   example: success
-     *                 data:
-     *                   type: object
-     *                   properties:
-     *                     user:
-     *                       $ref: '#/components/schemas/User'
-     *       404:
-     *         description: User not found
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/Error'
-     *       500:
-     *         description: Server error
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/Error'
      *   delete:
      *     summary: Delete a user by ID
      *     description: Delete a user by its ID.
@@ -198,7 +157,7 @@ router.route('/:id')
      *             schema:
      *               $ref: '#/components/schemas/Error'
      */
-    .get(requireJwtMiddleware,requestLogger, getUserById)
+    // .get(requireJwtMiddleware,requestLogger, getUser)
     .delete(requireJwtMiddleware,requestLogger, deleteUser)
     .put(requireJwtMiddleware,requestLogger, validateRequest(validateUserUpdate), updateUser);
 
